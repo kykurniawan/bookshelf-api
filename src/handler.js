@@ -3,10 +3,10 @@ const books = require('./data/books')
 const { validateNewBook, validateEditBook } = require('./utils/validation')
 
 /**
- * Handler adding new book item
+ * Handler for adding new book item
  * @param {*} request Request object
  * @param {*} h Response toolkit
- * @returns response
+ * @returns {*} response
  */
 const addBookHandler = (request, h) => {
     const id = nanoid(16)
@@ -72,17 +72,43 @@ const addBookHandler = (request, h) => {
     return response
 }
 
+/**
+ * Handler for getting all book items
+ * @param {*} request Request object
+ * @param {*} h Response toolkit
+ * @returns {*} response
+ */
 const getAllBooksHandler = (request, h) => {
+    const reading = request.query.reading
+    const finished = request.query.finished
+    const name = request.query.name
+    let booksData = books
+
+    if (reading !== undefined) {
+        booksData = booksData.filter((book) => book.reading === (reading === '1'))
+    }
+    if (finished !== undefined) {
+        booksData = booksData.filter((book) => book.finished === (finished === '1'))
+    }
+    if (name !== undefined) {
+        booksData = booksData.filter((book) => book.name.toLowerCase().includes(name.toLowerCase()))
+    }
     const response = h.response({
         status: 'success',
         data: {
-            books
+            books: booksData.map((book) => ({ id: book.id, name: book.name, publisher: book.publisher }))
         }
     })
     response.code(200)
     return response
 }
 
+/**
+ * Handler for getting book item with given id
+ * @param {*} request Request object
+ * @param {*} h Response toolkit
+ * @returns {*} response
+ */
 const getBookByIdHandler = (request, h) => {
     const { bookId } = request.params
 
@@ -105,11 +131,17 @@ const getBookByIdHandler = (request, h) => {
     return response
 }
 
+/**
+ * Handler for editing book data with given id
+ * @param {*} request Request object
+ * @param {*} h Response toolkit
+ * @returns {*} response
+ */
 const editBookByIdHandler = (request, h) => {
     const { bookId } = request.params
     const book = books.filter((book) => book.id === bookId)[0]
 
-    if (book !== undefined) {
+    if (book === undefined) {
         const response = h.response({
             status: 'fail',
             message: 'Gagal memperbarui buku. Id tidak ditemukan'
@@ -126,16 +158,7 @@ const editBookByIdHandler = (request, h) => {
         response.code(400)
         return response
     }
-    const {
-        name,
-        year,
-        author,
-        summary,
-        publisher,
-        pageCount,
-        readPage,
-        reading
-    } = request.payload
+    const { name, year, author, summary, publisher, pageCount, readPage, reading } = request.payload
 
     const updatedAt = new Date().toISOString()
 
@@ -170,9 +193,37 @@ const editBookByIdHandler = (request, h) => {
     return response
 }
 
+/**
+ * Handler for deleting book item with given id
+ * @param {*} request Request object
+ * @param {*} h Response toolkit
+ * @returns {*} response
+ */
+const deleteBookById = (request, h) => {
+    const { bookId } = request.params
+    const index = books.findIndex((book) => book.id === bookId)
+
+    if (index === -1) {
+        const response = h.response({
+            status: 'fail',
+            message: 'Buku gagal dihapus. Id tidak ditemukan'
+        })
+        response.code(404)
+        return response
+    }
+    books.splice(index, 1)
+    const response = h.response({
+        status: 'success',
+        message: 'Buku berhasil dihapus'
+    })
+    response.code(200)
+    return response
+}
+
 module.exports = {
     addBookHandler,
     getAllBooksHandler,
     getBookByIdHandler,
-    editBookByIdHandler
+    editBookByIdHandler,
+    deleteBookById
 }
