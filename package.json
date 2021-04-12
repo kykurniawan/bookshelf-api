@@ -1,0 +1,36 @@
+{
+  "name": "bookshelf-api",
+  "version": "1.0.0",
+  "description": "submission dicoding",
+  "main": "server.js",
+  "scripts": {
+    "test": "nodemon ./src/server.js",
+    "lint": "eslint ./src"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/kykurniawan/bookshelf-api.git"
+  },
+  "keywords": [
+    "submission",
+    "dicoding"
+  ],
+  "author": "rizkykurniawan",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kykurniawan/bookshelf-api/issues"
+  },
+  "homepage": "https://github.com/kykurniawan/bookshelf-api#readme",
+  "devDependencies": {
+    "eslint": "^7.24.0",
+    "eslint-config-standard": "^16.0.2",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^4.3.1",
+    "nodemon": "^2.0.7"
+  },
+  "dependencies": {
+    "@hapi/hapi": "^20.1.2",
+    "nanoid": "^3.1.22"
+  }
+}
